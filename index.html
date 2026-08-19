@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArmarTic | Luciano Martingasté — Data Analyst & Dashboards</title>
+<meta name="description" content="Diseño y desarrollo de dashboards interactivos en Python y Streamlit para negocios que necesitan ver sus datos con claridad.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F4F7FA;
+    --bg-grid: rgba(19,39,67,0.055);
+    --ink: #132743;
+    --ink-soft: #52667C;
+    --teal: #0EA5A0;
+    --teal-soft: #E3F5F4;
+    --amber: #F2A93B;
+    --indigo: #2A3EB1;
+    --card-bg: #FFFFFF;
+    --border: #DCE4EC;
+    --radius: 14px;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    background-image:
+      linear-gradient(var(--bg-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+    background-size: 28px 28px;
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+  img { max-width: 100%; display: block; }
+
+  :focus-visible {
+    outline: 2.5px solid var(--indigo);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+  h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; }
+
+  .mono { font-family: var(--font-mono); }
+
+  /* -------------------------------------------------- NAV */
+  header.nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(244,247,250,0.86);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-row {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--font-mono); font-weight: 600; font-size: 1rem;
+    text-decoration: none; color: var(--ink);
+  }
+  .logo-mark {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: var(--ink);
+    color: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 700;
+  }
+  nav.links { display: flex; gap: 28px; }
+  nav.links a {
+    text-decoration: none; color: var(--ink-soft); font-size: 0.92rem;
+    font-weight: 500; transition: color 0.15s ease;
+  }
+  nav.links a:hover { color: var(--indigo); }
+  .nav-cta {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--ink); color: var(--bg);
+    font-family: var(--font-mono); font-size: 0.82rem; font-weight: 500;
+    padding: 8px 16px; border-radius: 999px; text-decoration: none;
+    transition: background 0.15s ease;
+  }
+  .nav-cta:hover { background: var(--indigo); }
+  .nav-toggle { display: none; }
+
+  /* -------------------------------------------------- HERO */
+  .hero { padding: 76px 0 40px; position: relative; overflow: hidden; }
+  .hero-grid {
+    display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 40px; align-items: center;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 0.78rem; color: var(--teal);
+    background: var(--teal-soft); border: 1px solid rgba(14,165,160,0.3);
+    padding: 5px 12px; border-radius: 999px; margin-bottom: 20px;
+  }
+  .dot-live {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--teal);
+    animation: pulse 1.8s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(14,165,160,0.5); }
+    70% { box-shadow: 0 0 0 8px rgba(14,165,160,0); }
+    100% { box-shadow: 0 0 0 0 rgba(14,165,160,0); }
+  }
+  .hero h1 {
+    font-size: clamp(2.1rem, 4.4vw, 3.35rem);
+    font-weight: 700; line-height: 1.08; margin-bottom: 18px;
+  }
+  .hero h1 .accent { color: var(--teal); }
+  .hero-typed {
+    font-family: var(--font-mono); color: var(--ink-soft); font-size: 1.02rem;
+    min-height: 1.6em; margin-bottom: 18px;
+  }
+  .hero-typed .cursor { display: inline-block; width: 2px; background: var(--indigo); margin-left: 2px; animation: blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .hero p.bio { color: var(--ink-soft); max-width: 480px; margin-bottom: 26px; font-size: 1rem; }
+
+  .contact-row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .contact-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--card-bg); border: 1px solid var(--border);
+    padding: 9px 16px; border-radius: 999px; text-decoration: none;
+    font-size: 0.88rem; font-weight: 500; color: var(--ink);
+    transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .contact-pill:hover { border-color: var(--teal); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(19,39,67,0.08); }
+  .contact-pill .icon { font-size: 1rem; }
+  .contact-pill .value { color: var(--ink-soft); font-family: var(--font-mono); font-size: 0.8rem; }
+
+  /* signature: animated sparkline */
+  .signal-box {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 18px; padding: 22px 22px 16px;
+    box-shadow: 0 20px 44px rgba(19,39,67,0.08);
+  }
+  .signal-head {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+  .signal-head .live-tag { color: var(--teal); display: flex; align-items: center; gap: 6px; }
+  #sparkline path {
+    stroke-dasharray: 900;
+    stroke-dashoffset: 900;
+    animation: draw 2.6s ease-out forwards;
+  }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .signal-caption {
+    font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-soft);
+    display: flex; justify-content: space-between; margin-top: 4px;
+  }
+
+  /* -------------------------------------------------- STATS RULER */
+  .stats-ruler {
+    margin: 56px 0 8px; padding: 26px 0;
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 24px;
+  }
+  .stat-tick { position: relative; padding-left: 18px; }
+  .stat-tick::before {
+    content: ""; position: absolute; left: 0; top: 4px; bottom: 4px;
+    width: 2px; background: var(--amber);
+  }
+  .stat-num {
+    font-family: var(--font-mono); font-weight: 600; font-size: 1.7rem; color: var(--ink);
+  }
+  .stat-label { font-size: 0.85rem; color: var(--ink-soft); }
+
+  /* -------------------------------------------------- SECTIONS */
+  section { padding: 72px 0; }
+  .section-head { margin-bottom: 36px; max-width: 640px; }
+  .section-eyebrow {
+    font-family: var(--font-mono); font-size: 0.78rem; color: var(--indigo);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; display: block;
+  }
+  .section-head h2 { font-size: clamp(1.6rem, 2.6vw, 2.1rem); }
+  .section-head p { color: var(--ink-soft); margin-top: 10px; }
+
+  /* servicios */
+  .services-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px;
+  }
+  .service-card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 22px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .service-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(19,39,67,0.09);
+    border-color: var(--teal);
+  }
+  .service-icon { font-size: 1.5rem; margin-bottom: 12px; }
+  .service-card h3 { font-size: 1.02rem; margin-bottom: 8px; }
+  .service-card p { color: var(--ink-soft); font-size: 0.88rem; }
+
+  /* proyectos */
+  .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 26px; }
+  .filter-btn {
+    font-family: var(--font-mono); font-size: 0.8rem;
+    background: transparent; border: 1px solid var(--border); color: var(--ink-soft);
+    padding: 7px 14px; border-radius: 999px; cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .filter-btn:hover { border-color: var(--teal); color: var(--ink); }
+  .filter-btn.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  .projects-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  }
+  .term-card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    display: flex; flex-direction: column;
+  }
+  .term-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 34px rgba(19,39,67,0.1);
+    border-color: var(--teal);
+  }
+  .term-bar {
+    display: flex; align-items: center; gap: 6px;
+    padding: 10px 14px; background: #EEF2F6; border-bottom: 1px solid var(--border);
+  }
+  .term-dot { width: 9px; height: 9px; border-radius: 50%; }
+  .term-dot.r { background: #F2A93B; }
+  .term-dot.y { background: #DCE4EC; }
+  .term-dot.g { background: var(--teal); }
+  .term-path {
+    margin-left: 8px; font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-soft);
+  }
+  .term-body { padding: 18px 18px 20px; flex: 1; display: flex; flex-direction: column; }
+  .term-emoji { font-size: 1.5rem; margin-bottom: 8px; }
+  .term-category {
+    font-family: var(--font-mono); font-size: 0.7rem; color: var(--teal);
+    text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;
+  }
+  .term-body h3 { font-size: 1.05rem; margin-bottom: 8px; }
+  .term-body p.desc { color: var(--ink-soft); font-size: 0.87rem; flex: 1; margin-bottom: 12px; }
+  .term-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .tag {
+    font-family: var(--font-mono); font-size: 0.7rem; color: var(--ink-soft);
+    background: var(--bg); border: 1px solid var(--border);
+    padding: 3px 9px; border-radius: 999px;
+  }
+  .term-actions { display: flex; gap: 8px; }
+  .btn {
+    flex: 1; text-align: center; font-size: 0.82rem; font-weight: 600;
+    padding: 9px 10px; border-radius: 8px; text-decoration: none;
+    transition: opacity 0.15s ease;
+  }
+  .btn-primary { background: var(--ink); color: var(--bg); }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-disabled {
+    background: transparent; color: var(--ink-soft); border: 1px dashed var(--border);
+    cursor: default;
+  }
+
+  /* -------------------------------------------------- CTA */
+  .cta {
+    background: linear-gradient(135deg, var(--indigo), #4C63D9);
+    border-radius: 22px; padding: 52px 40px; text-align: center; color: white;
+    position: relative; overflow: hidden;
+  }
+  .cta h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 12px; color: white; }
+  .cta p { color: rgba(255,255,255,0.88); max-width: 480px; margin: 0 auto 26px; }
+  .cta-contacts { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+  .cta-contacts a {
+    background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.35);
+    padding: 9px 16px; border-radius: 999px; text-decoration: none; color: white;
+    font-size: 0.88rem; font-weight: 500;
+  }
+  .cta-button {
+    background: var(--amber); color: #2B1A00; border: none;
+    font-family: var(--font-display); font-weight: 700; font-size: 1rem;
+    padding: 14px 30px; border-radius: 999px; cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .cta-button:hover { transform: translateY(-2px) scale(1.02); }
+  .cta-response {
+    margin-top: 16px; font-size: 0.92rem; color: white; font-weight: 500;
+    min-height: 1.4em;
+  }
+
+  footer {
+    padding: 34px 0 50px; text-align: center;
+    color: var(--ink-soft); font-size: 0.85rem; font-family: var(--font-mono);
+  }
+
+  /* -------------------------------------------------- CONFETTI */
+  .confetti-piece {
+    position: fixed; top: -10px; z-index: 999; pointer-events: none;
+    border-radius: 2px; animation: fall linear forwards;
+  }
+  @keyframes fall {
+    to { transform: translateY(105vh) rotate(540deg); opacity: 0.4; }
+  }
+
+  /* -------------------------------------------------- RESPONSIVE */
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .services-grid { grid-template-columns: repeat(2, 1fr); }
+    .projects-grid { grid-template-columns: repeat(2, 1fr); }
+    nav.links { display: none; }
+  }
+  @media (max-width: 620px) {
+    .services-grid, .projects-grid { grid-template-columns: 1fr; }
+    .stats-ruler { flex-direction: column; gap: 18px; }
+    .nav-cta span.full { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-row">
+    <a href="#inicio" class="logo"><span class="logo-mark">AM</span> ArmarTic | Luciano Martingasté</a>
+    <nav class="links">
+      <a href="#servicios">Servicios</a>
+      <a href="#proyectos">Proyectos</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <a class="nav-cta" href="https://wa.me/5493755412428" target="_blank" rel="noopener">
+      <span>💬</span><span class="full">Escribime</span>
+    </a>
+  </div>
+</header>
+
+<main id="inicio">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow"><span class="dot-live"></span>Disponible para nuevos proyectos</div>
+        <h1>Tus datos, <span class="accent">leídos de un vistazo.</span></h1>
+        <div class="hero-typed mono" id="typed"></div>
+        <p class="bio">Diseño y desarrollo tableros de datos interactivos para negocios: desde control de gastos y marketing hasta detección de fraude y analítica de producto. Convierto datos crudos en decisiones claras, con soluciones a medida en Python y Streamlit.</p>
+        <div class="contact-row">
+          <a class="contact-pill" href="mailto:martingasteluciano@gmail.com">
+            <span class="icon">📧</span>Email <span class="value">martingasteluciano@gmail.com</span>
+          </a>
+          <a class="contact-pill" href="https://wa.me/5493755412428" target="_blank" rel="noopener">
+            <span class="icon">💬</span>WhatsApp <span class="value">+54 3755 412428</span>
+          </a>
+          <a class="contact-pill" href="https://drive.google.com/file/d/1lKG6qBUSpuz5f_Y9RAMtnskg0PGxwpQs/view?usp=drive_link" target="_blank" rel="noopener">
+            <span class="icon">💼</span>CV <span class="value">Curriculum Vitae</span>
+          </a>
+          <a class="contact-pill" href="https://www.linkedin.com/in/martingasteluciano" target="_blank" rel="noopener">
+            <span class="icon">🛅</span>LinkedIn <span class="value">/in/martingasteluciano</span>
+          </a>
+        </div>
+      </div>
+  </section>
+
+  <section id="servicios">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="section-eyebrow">Qué hago</span>
+        <h2>Servicios</h2>
+        <p>De la planilla suelta al tablero que se actualiza solo.</p>
+      </div>
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon">📊</div>
+          <h3>Dashboards a medida</h3>
+          <p>Tableros interactivos en Streamlit conectados a tus datos, con filtros, KPIs y visualizaciones claras para la toma de decisiones.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">⚙️</div>
+          <h3>Automatización de reportes</h3>
+          <p>Reemplazo de planillas manuales por procesos automáticos: carga de datos, cálculo de métricas y reportes siempre actualizados.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">🧠</div>
+          <h3>Analítica y modelos predictivos</h3>
+          <p>Clustering, segmentación, detección de anomalías y modelos simples aplicados a problemas reales de negocio.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">🔗</div>
+          <h3>Integración de datos</h3>
+          <p>Consolidación de fuentes (CSV, bases de datos, APIs) en un único tablero, sin depender de múltiples archivos sueltos.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="proyectos">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="section-eyebrow">Portfolio</span>
+        <h2>Tableros y proyectos</h2>
+        <p>Cada tarjeta es un repo real en GitHub, no una maqueta.</p>
+      </div>
+
+      <div class="filter-row" id="filterRow">
+        <button class="filter-btn active" data-filter="Todas">Todas</button>
+        <button class="filter-btn" data-filter="Finanzas personales">Finanzas personales</button>
+        <button class="filter-btn" data-filter="Agro / IoT">Agro / IoT</button>
+        <button class="filter-btn" data-filter="Riesgo / Fraude">Riesgo / Fraude</button>
+        <button class="filter-btn" data-filter="Marketing">Marketing</button>
+        <button class="filter-btn" data-filter="Analítica de producto">Analítica de producto</button>
+      </div>
+
+      <div class="projects-grid" id="projectsGrid">
+
+        <div class="term-card" data-category="Finanzas personales">
+          <div class="term-bar">
+            <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+            <span class="term-path">app_gastos_v1_08_2026</span>
+          </div>
+          <div class="term-body">
+            <div class="term-emoji">💸</div>
+            <div class="term-category">Finanzas personales</div>
+            <h3>Control de Gastos</h3>
+            <p class="desc">Seguimiento de gastos por categoría, con persistencia de datos en CSV y visualización de tendencias de consumo.</p>
+            <div class="term-tags"><span class="tag">Python</span><span class="tag">Streamlit</span><span class="tag">Pandas</span></div>
+            <div class="term-actions">
+              <a class="btn btn-primary" href="https://appgastosv1082026-ahn3txjsvpyadpavwaxjuc.streamlit.app/" target="_blank" rel="noopener">Tablero</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="term-card" data-category="Agro / IoT">
+          <div class="term-bar">
+            <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+            <span class="term-path">agro-tech-ai</span>
+          </div>
+          <div class="term-body">
+            <div class="term-emoji">🐄</div>
+            <div class="term-category">Agro / IoT</div>
+            <h3>Garruchos AgTech AI</h3>
+            <p class="desc">Monitoreo de un campo ganadero con datos simulados de sensores: salud, ubicación y comportamiento del ganado.</p>
+            <div class="term-tags"><span class="tag">Python</span><span class="tag">Streamlit</span><span class="tag">Simulación</span></div>
+            <div class="term-actions">
+              <a class="btn btn-primary" href="https://garruchos-agtech-ai.streamlit.app/" target="_blank" rel="noopener">Tablero</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="term-card" data-category="Riesgo / Fraude">
+          <div class="term-bar">
+            <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+            <span class="term-path">fraude-risk</span>
+          </div>
+          <div class="term-body">
+            <div class="term-emoji">🕵️</div>
+            <div class="term-category">Riesgo / Fraude</div>
+            <h3>Fraude Risk</h3>
+            <p class="desc">Simulación analítica para identificar patrones de fraude, con indicadores de riesgo y casos sospechosos.</p>
+            <div class="term-tags"><span class="tag">Python</span><span class="tag">Streamlit</span><span class="tag">Riesgo</span></div>
+            <div class="term-actions">
+              <a class="btn btn-primary" href="https://fraude-risk.streamlit.app/" target="_blank" rel="noopener">Tablero</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="term-card" data-category="Marketing">
+          <div class="term-bar">
+            <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+            <span class="term-path">tablero_marketing</span>
+          </div>
+          <div class="term-body">
+            <div class="term-emoji">📣</div>
+            <div class="term-category">Marketing</div>
+            <h3>Tablero de Marketing</h3>
+            <p class="desc">Variables de marketing simuladas: performance de campañas, alcance y métricas clave para equipos comerciales.</p>
+            <div class="term-tags"><span class="tag">Python</span><span class="tag">Streamlit</span></div>
+            <div class="term-actions">
+              <a class="btn btn-primary" href="https://tableromarketing.streamlit.app/" target="_blank" rel="noopener">Tablero</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="term-card" data-category="Analítica de producto">
+          <div class="term-bar">
+            <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+            <span class="term-path">elasticidad-clustering</span>
+          </div>
+          <div class="term-body">
+            <div class="term-emoji">🧩</div>
+            <div class="term-category">Analítica de producto</div>
+            <h3>Elasticidad y Clustering de Productos</h3>
+            <p class="desc">Elasticidad de precios y clustering de productos, con métricas para decisiones de pricing y catálogo.</p>
+            <div class="term-tags"><span class="tag">Python</span><span class="tag">Streamlit</span><span class="tag">Clustering</span></div>
+            <div class="term-actions">
+              <a class="btn btn-primary" href="https://tablerocomercial.streamlit.app/" target="_blank" rel="noopener">Tablero</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="contacto">
+    <div class="wrap">
+      <div class="cta">
+        <h2>¿Necesitás un tablero para tu negocio? 🚀</h2>
+        <p>Desarrollo dashboards a medida para equipos y empresas que necesitan ver sus datos con claridad y tomar decisiones más rápido.</p>
+        <div class="cta-contacts">
+          <a href="mailto:martingasteluciano@gmail.com">📧 martingasteluciano@gmail.com</a>
+          <a href="https://wa.me/5493755412428" target="_blank" rel="noopener">💬 WhatsApp</a>
+          <a href="www.linkedin.com/in/martingasteluciano" target="_blank" rel="noopener">💼 LinkedIn</a>
+        </div>
+        <button class="cta-button" id="ctaBtn">💬 ¡Hablemos de tu proyecto!</button>
+        <div class="cta-response" id="ctaResponse"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  © <span id="year"></span> ArmarTic | Luciano Martingasté — Portfolio de tableros de datos. Hecho con HTML, CSS y algo de mate.
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // ---- Typed rotating subtitle ----
+  const frases = [
+    "Data Analyst & Desarrollador de Dashboards Interactivos",
+    "Convierto planillas caóticas en tableros que se entienden",
+    "Python + Streamlit + café = decisiones más rápidas"
+  ];
+  const typedEl = document.getElementById('typed');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reducedMotion) {
+    typedEl.textContent = frases[0];
+  } else {
+    let fi = 0, ci = 0, deleting = false;
+    function typeTick() {
+      const frase = frases[fi];
+      if (!deleting) {
+        ci++;
+        typedEl.innerHTML = frase.slice(0, ci) + '<span class="cursor">&nbsp;</span>';
+        if (ci === frase.length) { deleting = true; setTimeout(typeTick, 1500); return; }
+      } else {
+        ci--;
+        typedEl.innerHTML = frase.slice(0, ci) + '<span class="cursor">&nbsp;</span>';
+        if (ci === 0) { deleting = false; fi = (fi + 1) % frases.length; }
+      }
+      setTimeout(typeTick, deleting ? 22 : 42);
+    }
+    typeTick();
+  }
+
+  // ---- Animated stat counters (on scroll into view) ----
+  const statEls = document.querySelectorAll('.stat-num');
+  const statObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.dataset.count, 10);
+        const suffix = el.dataset.suffix || '';
+        if (reducedMotion) { el.textContent = target + suffix; statObserver.unobserve(el); return; }
+        let cur = 0;
+        const step = Math.max(1, Math.ceil(target / 40));
+        const timer = setInterval(() => {
+          cur += step;
+          if (cur >= target) { cur = target; clearInterval(timer); }
+          el.textContent = cur + suffix;
+        }, 28);
+        statObserver.unobserve(el);
+      }
+    });
+  }, { threshold: 0.4 });
+  statEls.forEach(el => statObserver.observe(el));
+
+  // ---- Project filter ----
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const projectCards = document.querySelectorAll('.term-card');
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      projectCards.forEach(card => {
+        const match = filter === 'Todas' || card.dataset.category === filter;
+        card.style.display = match ? '' : 'none';
+      });
+    });
+  });
+
+  // ---- CTA button: message + confetti ----
+  const frasesHumor = [
+    "🎉 ¡Genial! Te escribo apenas vea el mensaje.",
+    "🚀 Contame tu idea, la convertimos en tablero.",
+    "☕ Dato curioso: el 90% de mis mejores ideas nacen tomando mate.",
+    "📈 Menos Excel enredado, más decisiones claras. ¡Vamos!"
+  ];
+  const ctaBtn = document.getElementById('ctaBtn');
+  const ctaResponse = document.getElementById('ctaResponse');
+  const confettiColors = ['#F2A93B', '#0EA5A0', '#FFFFFF', '#4C63D9'];
+
+  ctaBtn.addEventListener('click', () => {
+    ctaResponse.textContent = frasesHumor[Math.floor(Math.random() * frasesHumor.length)];
+    if (reducedMotion) return;
+    for (let i = 0; i < 26; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      const size = 6 + Math.random() * 6;
+      piece.style.width = size + 'px';
+      piece.style.height = size * 0.4 + 'px';
+      piece.style.left = Math.random() * 100 + 'vw';
+      piece.style.background = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+      piece.style.animationDuration = (2.2 + Math.random() * 1.6) + 's';
+      piece.style.animationDelay = (Math.random() * 0.3) + 's';
+      document.body.appendChild(piece);
+      setTimeout(() => piece.remove(), 4200);
+    }
+  });
+</script>
+
+</body>
+</html>
